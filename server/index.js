@@ -13,7 +13,6 @@ const wss = new WebSocketServer({ server });
 
 const PORT = process.env.PORT || 3000;
 const MTA_API_KEY = process.env.MTA_API_KEY;
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS) || 30000;
 
 if (!MTA_API_KEY || MTA_API_KEY === 'your_mta_api_key_here') {
@@ -23,10 +22,8 @@ if (!MTA_API_KEY || MTA_API_KEY === 'your_mta_api_key_here') {
 // Serve static files
 app.use(express.static(path.join(__dirname, '..', 'client')));
 
-// Provide mapbox token to client (without exposing .env)
 app.get('/api/config', (req, res) => {
   res.json({
-    mapboxToken: MAPBOX_TOKEN || '',
     pollInterval: POLL_INTERVAL,
     demoMode: !MTA_API_KEY || MTA_API_KEY === 'your_mta_api_key_here',
   });

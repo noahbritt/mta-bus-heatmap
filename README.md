@@ -6,14 +6,15 @@ Live animated heatmap of every active MTA bus in New York City.
 
 ## Features
 
-- **Live heatmap** of all active MTA buses, updating every 30s
+- **Live bus map** of all active MTA buses, updating every 30s
 - **Dot view** with color-coding by route, occupancy, or speed
+- **Heatmap view** to visualize bus density across the city
 - **Borough & route filtering**
 - **Click hot zones** to see which routes contribute to density
 - **Stats dashboard** — total buses, busiest route, moving vs stationary, occupancy breakdown
-- **Timelapse playback** — record a full day and play it back at 1x–360x speed
+- **Timelapse playback** — record a full day and play it back at 1x-360x speed
 - **Pulse mode** — breathing heatmap effect synced to bus density
-- **Demo mode** — works without an API key using realistic simulated data
+- **Demo mode** — works without an API key using simulated data
 
 ## Quick Start
 
@@ -26,16 +27,14 @@ Open http://localhost:3000.
 
 The app starts in **demo mode** with simulated bus data. To use live MTA data:
 
-1. Register for a free API key at https://register.developer.obanyc.com (takes ~30 min)
-2. Get a Mapbox token at https://mapbox.com (free tier works)
-3. Edit `.env`:
+1. Register for a free API key at https://register.developer.obanyc.com
+2. Edit `.env`:
 
 ```
 MTA_API_KEY=your_key_here
-MAPBOX_TOKEN=your_token_here
 ```
 
-4. Restart the server
+3. Restart the server
 
 ## Controls
 
@@ -54,12 +53,12 @@ The server records every poll to SQLite. Switch to Timelapse mode, select a reco
 
 ## Architecture
 
-- **Server**: Node.js + Express + WebSocket. Polls MTA BusTime SIRI API, broadcasts to clients, records to SQLite.
-- **Client**: Vanilla JS with Deck.gl (HeatmapLayer, ScatterplotLayer) over Mapbox GL JS.
+- **Server**: Node.js + Express + WebSocket. Polls the MTA GTFS-RT Vehicle Positions feed, broadcasts to clients, records to SQLite.
+- **Client**: Vanilla JS with Leaflet + CartoDB dark tiles + leaflet-heat.
 - **Storage**: SQLite via better-sqlite3. Auto-cleans data older than 7 days.
 
 ## API Notes
 
-- MTA bearing convention: 0 = East, counter-clockwise. The server converts to standard (0 = North, clockwise).
+- Uses the GTFS-RT Vehicle Positions feed (bulk-friendly, protobuf format).
 - Stale vehicle positions (>5 min old) are filtered out.
-- `ProgressRate: noProgress` = stationary bus.
+- Polls every 30 seconds to respect MTA rate limits.
