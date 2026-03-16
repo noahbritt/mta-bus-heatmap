@@ -1,0 +1,16 @@
+{
+  "name": "mta-bus-heatmap",
+  "version": "1.0.0",
+  "description": "Live animated heatmap of every MTA bus in NYC",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "gtfs-realtime-bindings": "^1.1.1",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTA Bus Heatmap — NYC Live</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <h1>MTA Bus Heatmap</h1>
+    <div class="subtitle"><span class="live-dot"></span>NYC Live Bus Tracker</div>
+
+    <div class="control-group">
+      <label>View Mode</label>
+      <div class="toggle-group">
+        <button class="toggle-btn" data-mode="heatmap">Heatmap</button>
+        <button class="toggle-btn active" data-mode="dots">Buses</button>
+      </div>
+    </div>
+
+    <div class="control-group" id="color-by-group">
+      <label>Color By</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-color="route">Route</button>
+        <button class="toggle-btn" data-color="occupancy">Occupancy</button>
+        <button class="toggle-btn" data-color="speed">Speed</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Borough</label>
+      <select id="borough-filter">
+        <option value="all">All Boroughs</option>
+        <option value="manhattan">Manhattan</option>
+        <option value="brooklyn">Brooklyn</option>
+        <option value="queens">Queens</option>
+        <option value="bronx">Bronx</option>
+        <option value="statenisland">Staten Island</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Route</label>
+      <input type="text" id="route-filter" placeholder="Search routes (e.g. B63, M14)">
+      <select id="route-select" size="1" style="margin-top:4px">
+        <option value="all">All Routes</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Mode</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-live="live">Live</button>
+        <button class="toggle-btn" data-live="timelapse">Timelapse</button>
+      </div>
+    </div>
+
+    <div class="control-group" id="pulse-group">
+      <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:#ccc;cursor:pointer">
+        <input type="checkbox" id="pulse-toggle"> Pulse Mode
+      </label>
+    </div>
+
+    <div id="color-legend"></div>
+  </div>
+
+  <!-- Stats -->
+  <div id="stats">
+    <div class="stat-row">
+      <span class="stat-label">Active Buses</span>
+      <span class="stat-value big" id="stat-total">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Busiest Route</span>
+      <span class="stat-value" id="stat-busiest">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Moving</span>
+      <span class="stat-value" id="stat-moving">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Stationary</span>
+      <span class="stat-value" id="stat-stationary">—</span>
+    </div>
+    <div id="occupancy-bars">
+      <div class="occ-bar">
+        <span class="occ-label">Seats</span>
+        <div class="bar-track"><div class="bar-fill seats" id="bar-seats" style="width:0"></div></div>
+        <span class="occ-count" id="cnt-seats">0</span>
+      </div>
+      <div class="occ-bar">
+        <span class="occ-label">Standing</span>
+        <div class="bar-track"><div class="bar-fill standing" id="bar-standing" style="width:0"></div></div>
+        <span class="occ-count" id="cnt-standing">0</span>
+      </div>
+      <div class="occ-bar">
+        <span class="occ-label">Full</span>
+        <div class="bar-track"><div class="bar-fill full" id="bar-full" style="width:0"></div></div>
+        <span class="occ-count" id="cnt-full">0</span>
+      </div>
+    </div>
+    <div class="stat-row" style="margin-top:6px">
+      <span class="stat-label">Last Update</span>
+      <span class="stat-value" id="stat-time" style="font-size:11px;font-weight:400">—</span>
+    </div>
+  </div>
+
+  <!-- Demo badge -->
+  <div id="demo-badge">DEMO MODE — Set MTA_API_KEY in .env for live data</div>
+
+  <!-- Timelapse -->
+  <div id="timelapse-panel">
+    <span id="timelapse-clock">00:00</span>
+    <button class="tl-btn" id="tl-play">Play</button>
+    <input type="range" id="timelapse-scrubber" min="0" max="100" value="0">
+    <select id="tl-speed" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;border-radius:6px;padding:4px;font-size:11px">
+      <option value="1">1x</option>
+      <option value="10">10x</option>
+      <option value="60" selected>60x</option>
+      <option value="360">360x</option>
+    </select>
+    <select id="tl-day" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;border-radius:6px;padding:4px;font-size:11px">
+      <option value="">Select day...</option>
+    </select>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip">
+    <div class="tip-title"></div>
+    <div class="tip-routes"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
